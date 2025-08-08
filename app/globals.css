@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+main {
+  margin-top: 56px; /* hauteur top bar mobile */
+  padding: 0px;
+}
+
+@media (min-width: 768px) {
+  main {
+    margin-left: 256px; /* largeur sidebar desktop */
+    margin-top: 0px;    
+    padding: 6px;
+  }
+}
