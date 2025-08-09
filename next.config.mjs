@@ -5,14 +5,17 @@
 
 import withPWA from 'next-pwa';
 
-const nextConfig = withPWA({
+const pwaOptions = {
   dest: 'public',
   disable: process.env.NODE_ENV === 'development',
-  experimental: {
-    appDir: true,
-  },
-  reactStrictMode: true,
-});
+};
 
-export default nextConfig;
+const nextConfig = {
+  reactStrictMode: true,
+  // supprime experimental.appDir
+};
+
+export default withPWA(pwaOptions)(nextConfig);
+
+
 
