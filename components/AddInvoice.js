@@ -10,8 +10,9 @@ import {
   HiTrash,
   HiCube,
   HiXCircle,
-  HiCheckCircle,
 } from 'react-icons/hi';
+import FactureModal from "./FactureModal";
+import { toast } from 'react-hot-toast';
 
 function Spinner() {
   return (
@@ -47,18 +48,14 @@ export default function AddInvoice() {
     prenom: '',
     numeroRegistreCommerce: '',
   });
-
   const [numeroFacture, setNumeroFacture] = useState('');
-  const [dateFacture, setDateFacture] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
-
-  const [produits, setProduits] = useState([
-    { id: 1, nom: '', prixUnitaire: '', quantite: '', montant: 0 },
-  ]);
-
+  const [dateFacture, setDateFacture] = useState(new Date().toISOString().slice(0, 10));
+  const [produits, setProduits] = useState([{ id: 1, nom: '', prixUnitaire: '', quantite: '', montant: 0 }]);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [factureData, setFactureData] = useState(null);
 
   useEffect(() => {
     async function fetchClients() {
@@ -67,8 +64,7 @@ export default function AddInvoice() {
         if (!res.ok) throw new Error('Erreur chargement clients');
         const data = await res.json();
         setClients(data);
-      } catch (err) {
-        console.error(err);
+      } catch {
         setClients([]);
       }
     }
@@ -77,27 +73,18 @@ export default function AddInvoice() {
 
   function validate() {
     let newErrors = {};
-
-    // Client info
     if (!selectedClientId) {
       if (!manualClient.nom.trim()) newErrors.nom = 'Nom requis';
       if (!manualClient.prenom.trim()) newErrors.prenom = 'Prénom requis';
-      if (!manualClient.numeroRegistreCommerce.trim())
-        newErrors.numeroRegistreCommerce = 'Numéro requis';
+      if (!manualClient.numeroRegistreCommerce.trim()) newErrors.numeroRegistreCommerce = 'Numéro requis';
     }
-
     if (!numeroFacture.trim()) newErrors.numeroFacture = 'Numéro facture requis';
-
     if (produits.length === 0) newErrors.produits = 'Ajouter au moins un produit';
-
     produits.forEach((p, i) => {
       if (!p.nom.trim()) newErrors[`prod_nom_${i}`] = 'Nom produit requis';
-      if (!p.prixUnitaire || isNaN(p.prixUnitaire) || +p.prixUnitaire <= 0)
-        newErrors[`prod_prix_${i}`] = 'Prix unitaire > 0 requis';
-      if (!p.quantite || isNaN(p.quantite) || +p.quantite <= 0)
-        newErrors[`prod_qte_${i}`] = 'Quantité > 0 requise';
+      if (!p.prixUnitaire || isNaN(p.prixUnitaire) || +p.prixUnitaire <= 0) newErrors[`prod_prix_${i}`] = 'Prix unitaire > 0 requis';
+      if (!p.quantite || isNaN(p.quantite) || +p.quantite <= 0) newErrors[`prod_qte_${i}`] = 'Quantité > 0 requise';
     });
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -106,28 +93,20 @@ export default function AddInvoice() {
     setProduits((prev) => {
       const newProds = [...prev];
       newProds[index][field] = value;
-
       const prix = parseFloat(newProds[index].prixUnitaire);
       const qte = parseInt(newProds[index].quantite);
       newProds[index].montant = isNaN(prix) || isNaN(qte) ? 0 : prix * qte;
-
       return newProds;
     });
-
     setErrors((prev) => {
       const newErrors = { ...prev };
-      delete newErrors[
-        `prod_${field === 'nom' ? 'nom' : field === 'prixUnitaire' ? 'prix' : 'qte'}_${index}`
-      ];
+      delete newErrors[`prod_${field === 'nom' ? 'nom' : field === 'prixUnitaire' ? 'prix' : 'qte'}_${index}`];
       return newErrors;
     });
   }
 
   function addProduit() {
-    setProduits((prev) => [
-      ...prev,
-      { id: Date.now(), nom: '', prixUnitaire: '', quantite: '', montant: 0 },
-    ]);
+    setProduits((prev) => [...prev, { id: Date.now(), nom: '', prixUnitaire: '', quantite: '', montant: 0 }]);
   }
 
   function removeProduit(index) {
@@ -138,20 +117,33 @@ export default function AddInvoice() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     if (!validate()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-
     setSaving(true);
     try {
-      // Ici tu peux envoyer la facture au backend
-      await new Promise((r) => setTimeout(r, 1000)); // simulate API call
-      alert('Facture enregistrée avec succès !');
-      // reset form ou redirection possible ici
-    } catch {
-      alert("Erreur lors de l'enregistrement");
+      const resFabricant = await fetch('/api/information');
+      if (!resFabricant.ok) throw new Error('Erreur récupération fabricant');
+      const fabricant = await resFabricant.json();
+
+      const facture = {
+        fabricant,
+        client: selectedClientId
+          ? clients.find((c) => c._id === selectedClientId)
+          : manualClient,
+        numeroFacture,
+        dateFacture,
+        produits: produits.map(({ id, ...rest }) => rest),
+        total,
+      };
+
+      // Ouvrir le modal avec les données
+      setFactureData(facture);
+      setOpenModal(true);
+
+    } catch (error) {
+      toast.error(error.message || "Erreur lors de l'enregistrement");
     } finally {
       setSaving(false);
     }
@@ -160,9 +152,11 @@ export default function AddInvoice() {
   return (
     <form
       onSubmit={handleSubmit}
-      className=" mx-auto p-6 bg-white rounded-lg shadow-md space-y-8"
+      className="mx-auto p-6 bg-white rounded-lg shadow-md space-y-8 text-xs sm:text-base"
       noValidate
     >
+      {/* ... Le reste du JSX reste inchangé ... */}
+
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Ajouter une facture
       </h2>
@@ -179,15 +173,8 @@ export default function AddInvoice() {
             setSelectedClientId(e.target.value);
             if (e.target.value) {
               const c = clients.find((c) => c._id === e.target.value);
-              if (c)
-                setManualClient({
-                  nom: c.nom,
-                  prenom: c.prenom,
-                  numeroRegistreCommerce: c.numeroRegistreCommerce,
-                });
-            } else {
-              setManualClient({ nom: '', prenom: '', numeroRegistreCommerce: '' });
-            }
+              if (c) setManualClient({ nom: c.nom, prenom: c.prenom, numeroRegistreCommerce: c.numeroRegistreCommerce });
+            } else setManualClient({ nom: '', prenom: '', numeroRegistreCommerce: '' });
             setErrors((prev) => {
               const newErrors = { ...prev };
               delete newErrors.nom;
@@ -209,96 +196,32 @@ export default function AddInvoice() {
 
       {/* Manual Client */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
-            <HiUser className="text-[#27ae60] w-5 h-5" />
-            Nom
-          </label>
-          <input
-            type="text"
-            value={manualClient.nom}
-            onChange={(e) =>
-              setManualClient((prev) => ({ ...prev, nom: e.target.value }))
-            }
-            disabled={selectedClientId !== ''}
-            placeholder="Nom"
-            className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition disabled:bg-gray-100 ${
-              errors.nom ? 'border-red-500' : 'border-gray-300'
-            }`}
-            aria-invalid={!!errors.nom}
-            aria-describedby="error-nom"
-          />
-          {errors.nom && (
-            <p
-              className="text-red-600 text-sm mt-1 flex items-center gap-1"
-              id="error-nom"
-            >
-              <HiXCircle className="w-4 h-4" />
-              {errors.nom}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
-            <HiUser className="text-[#27ae60] w-5 h-5 rotate-180" />
-            Prénom
-          </label>
-          <input
-            type="text"
-            value={manualClient.prenom}
-            onChange={(e) =>
-              setManualClient((prev) => ({ ...prev, prenom: e.target.value }))
-            }
-            disabled={selectedClientId !== ''}
-            placeholder="Prénom"
-            className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition disabled:bg-gray-100 ${
-              errors.prenom ? 'border-red-500' : 'border-gray-300'
-            }`}
-            aria-invalid={!!errors.prenom}
-            aria-describedby="error-prenom"
-          />
-          {errors.prenom && (
-            <p
-              className="text-red-600 text-sm mt-1 flex items-center gap-1"
-              id="error-prenom"
-            >
-              <HiXCircle className="w-4 h-4" />
-              {errors.prenom}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
-            <HiIdentification className="text-[#27ae60] w-5 h-5" />
-            N° Registre Commerce
-          </label>
-          <input
-            type="text"
-            value={manualClient.numeroRegistreCommerce}
-            onChange={(e) =>
-              setManualClient((prev) => ({
-                ...prev,
-                numeroRegistreCommerce: e.target.value,
-              }))
-            }
-            disabled={selectedClientId !== ''}
-            placeholder="N° Registre"
-            className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition disabled:bg-gray-100 ${
-              errors.numeroRegistreCommerce ? 'border-red-500' : 'border-gray-300'
-            }`}
-            aria-invalid={!!errors.numeroRegistreCommerce}
-            aria-describedby="error-numeroRegistreCommerce"
-          />
-          {errors.numeroRegistreCommerce && (
-            <p
-              className="text-red-600 text-sm mt-1 flex items-center gap-1"
-              id="error-numeroRegistreCommerce"
-            >
-              <HiXCircle className="w-4 h-4" />
-              {errors.numeroRegistreCommerce}
-            </p>
-          )}
-        </div>
+        {['nom', 'prenom', 'numeroRegistreCommerce'].map((field) => (
+          <div key={field}>
+            <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
+              {field === 'nom' || field === 'prenom' ? <HiUser className={`text-[#27ae60] w-5 h-5${field==='prenom'?' rotate-180':''}`} /> : <HiIdentification className="text-[#27ae60] w-5 h-5" />}
+              {field === 'nom' ? 'Nom' : field === 'prenom' ? 'Prénom' : 'N° Registre Commerce'}
+            </label>
+            <input
+              type="text"
+              value={manualClient[field]}
+              onChange={(e) => setManualClient((prev) => ({ ...prev, [field]: e.target.value }))}
+              disabled={selectedClientId !== ''}
+              placeholder={field === 'numeroRegistreCommerce' ? 'N° Registre' : field === 'prenom' ? 'Prénom' : 'Nom'}
+              className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition disabled:bg-gray-100 ${
+                errors[field] ? 'border-red-500' : 'border-gray-300'
+              }`}
+              aria-invalid={!!errors[field]}
+              aria-describedby={`error-${field}`}
+            />
+            {errors[field] && (
+              <p className="text-red-600 text-sm mt-1 flex items-center gap-1" id={`error-${field}`}>
+                <HiXCircle className="w-4 h-4" />
+                {errors[field]}
+              </p>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Numéro et Date */}
@@ -321,10 +244,7 @@ export default function AddInvoice() {
             aria-describedby="error-numeroFacture"
           />
           {errors.numeroFacture && (
-            <p
-              className="text-red-600 text-sm mt-1 flex items-center gap-1"
-              id="error-numeroFacture"
-            >
+            <p className="text-red-600 text-sm mt-1 flex items-center gap-1" id="error-numeroFacture">
               <HiXCircle className="w-4 h-4" />
               {errors.numeroFacture}
             </p>
@@ -364,9 +284,7 @@ export default function AddInvoice() {
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
                 <th className="border border-gray-300 px-4 py-2 text-left">Produit</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Prix unitaire (DA)
-                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Prix unitaire (DA)</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Quantité</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Montant (DA)</th>
                 <th className="border border-gray-300 px-4 py-2 text-center">Actions</th>
@@ -389,10 +307,7 @@ export default function AddInvoice() {
                       aria-describedby={`error-prod-nom-${i}`}
                     />
                     {errors[`prod_nom_${i}`] && (
-                      <p
-                        className="text-red-600 text-xs mt-1 flex items-center gap-1"
-                        id={`error-prod-nom-${i}`}
-                      >
+                      <p className="text-red-600 text-xs mt-1 flex items-center gap-1" id={`error-prod-nom-${i}`}>
                         <HiXCircle className="w-3 h-3" />
                         {errors[`prod_nom_${i}`]}
                       </p>
@@ -414,10 +329,7 @@ export default function AddInvoice() {
                       aria-describedby={`error-prod-prix-${i}`}
                     />
                     {errors[`prod_prix_${i}`] && (
-                      <p
-                        className="text-red-600 text-xs mt-1 flex items-center gap-1"
-                        id={`error-prod-prix-${i}`}
-                      >
+                      <p className="text-red-600 text-xs mt-1 flex items-center gap-1" id={`error-prod-prix-${i}`}>
                         <HiXCircle className="w-3 h-3" />
                         {errors[`prod_prix_${i}`]}
                       </p>
@@ -439,10 +351,7 @@ export default function AddInvoice() {
                       aria-describedby={`error-prod-qte-${i}`}
                     />
                     {errors[`prod_qte_${i}`] && (
-                      <p
-                        className="text-red-600 text-xs mt-1 flex items-center gap-1"
-                        id={`error-prod-qte-${i}`}
-                      >
+                      <p className="text-red-600 text-xs mt-1 flex items-center gap-1" id={`error-prod-qte-${i}`}>
                         <HiXCircle className="w-3 h-3" />
                         {errors[`prod_qte_${i}`]}
                       </p>
@@ -457,9 +366,7 @@ export default function AddInvoice() {
                       onClick={() => removeProduit(i)}
                       disabled={produits.length === 1}
                       className={`inline-flex items-center justify-center gap-1 px-3 py-1 rounded-md text-white text-sm font-semibold transition ${
-                        produits.length === 1
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                        produits.length === 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 cursor-pointer'
                       }`}
                       aria-label="Supprimer produit"
                     >
@@ -472,7 +379,6 @@ export default function AddInvoice() {
           </table>
         </div>
 
-        {/* Total indépendant */}
         <div className="mt-2 flex justify-end items-center bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800 ">
           Total : {total.toFixed(2)} DA
         </div>
@@ -487,7 +393,6 @@ export default function AddInvoice() {
         </button>
       </div>
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={saving}
@@ -498,6 +403,11 @@ export default function AddInvoice() {
         {saving && <Spinner />}
         {!saving ? 'Enregistrer la facture' : 'Enregistrement...'}
       </button>
+      <FactureModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        facture={factureData}
+      />
     </form>
   );
 }

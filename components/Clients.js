@@ -156,14 +156,14 @@ export default function Clients() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-base sm:text-2xl font-semibold mb-6 text-[#212b36] select-none">
+      <h2 className="text-2xl font-semibold mb-6 text-[#212b36] select-none">
         Liste des clients
       </h2>
 
       {loading ? (
         <ClientSkeleton />
       ) : clients.length === 0 ? (
-        <p className="text-base text-gray-500 text-center">Aucun client trouvé.</p>
+        <p className="text-center text-gray-500">Aucun client trouvé.</p>
       ) : (
         <div className="space-y-4">
           {clients.map(client => (
@@ -172,11 +172,11 @@ export default function Clients() {
               className="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex items-center justify-between hover:shadow-lg transition cursor-default"
             >
               <div>
-                <h3 className="text-base sm:text-lg font-semibold text-[#27ae60] select-text flex items-center space-x-2">
+                <h3 className="text-lg font-semibold text-[#27ae60] select-text flex items-center space-x-2">
                   <HiUser className="text-[#27ae60]" />
                   <span>{client.nom} {client.prenom}</span>
                 </h3>
-                <p className="text-base sm:text-sm text-gray-700 select-text flex items-center space-x-2">
+                <p className="text-gray-700 text-sm select-text flex items-center space-x-2">
                   <HiIdentification className="text-gray-500" />
                   <span><span className="font-semibold">N° Registre :</span> {client.numeroRegistreCommerce}</span>
                 </p>
@@ -216,52 +216,52 @@ export default function Clients() {
               <HiX size={24} />
             </button>
 
-            <h3 className="text-base sm:text-xl font-semibold mb-4">Modifier le client</h3>
+            <h3 className="text-xl font-semibold mb-4">Modifier le client</h3>
 
             <label className="block mb-3">
-              <span className="block text-base sm:text-sm font-medium text-gray-700">Nom</span>
+              <span className="block text-sm font-medium text-gray-700">Nom</span>
               <input
                 type="text"
                 name="nom"
                 value={editingClient.nom}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-base sm:text-base focus:outline-none focus:ring-2 focus:ring-[#27ae60]"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60]"
               />
             </label>
 
             <label className="block mb-3">
-              <span className="block text-base sm:text-sm font-medium text-gray-700">Prénom</span>
+              <span className="block text-sm font-medium text-gray-700">Prénom</span>
               <input
                 type="text"
                 name="prenom"
                 value={editingClient.prenom}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-base sm:text-base focus:outline-none focus:ring-2 focus:ring-[#27ae60]"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60]"
               />
             </label>
 
             <label className="block mb-5">
-              <span className="block text-base sm:text-sm font-medium text-gray-700">Numéro registre de commerce</span>
+              <span className="block text-sm font-medium text-gray-700">Numéro registre de commerce</span>
               <input
                 type="text"
                 name="numeroRegistreCommerce"
                 value={editingClient.numeroRegistreCommerce}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-base sm:text-base focus:outline-none focus:ring-2 focus:ring-[#27ae60]"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60]"
               />
             </label>
 
             <div className="flex justify-end space-x-4">
               <button
                 onClick={closeEditModal}
-                className="cursor-pointer px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition text-base sm:text-base"
+                className="cursor-pointer px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
               >
                 Annuler
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className={`cursor-pointer px-4 py-2 rounded-md font-semibold text-white text-base sm:text-base ${
+                className={`cursor-pointer px-4 py-2 rounded-md font-semibold text-white ${
                   saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#27ae60] hover:bg-[#1f7a34]'
                 } transition`}
               >
@@ -284,11 +284,11 @@ export default function Clients() {
               <HiX size={24} />
             </button>
 
-            <h3 className="text-base sm:text-lg font-semibold mb-4">
+            <h3 className="text-lg font-semibold mb-4">
               Confirmer la suppression
             </h3>
 
-            <p className="mb-6 text-base sm:text-base">
+            <p className="mb-6">
               Voulez-vous vraiment supprimer{' '}
               <span className="font-semibold">
                 {deletingClient.nom} {deletingClient.prenom}
@@ -300,14 +300,14 @@ export default function Clients() {
               <button
                 onClick={closeDeleteModal}
                 disabled={deleting}
-                className="cursor-pointer px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition text-base sm:text-base"
+                className="cursor-pointer px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
               >
                 Annuler
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className={`cursor-pointer px-4 py-2 rounded-md font-semibold text-white text-base sm:text-base ${
+                className={`cursor-pointer px-4 py-2 rounded-md font-semibold text-white ${
                   deleting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
                 } transition`}
               >
