@@ -9,7 +9,7 @@ import Clients from '@/components/Clients';
 import AddInvoice from '@/components/AddInvoice';
 
 export default function HomePage() {
-  const [view, setView] = useState('information');
+  const [view, setView] = useState('');
 
   function renderContent() {
     switch (view) {
