@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.3.0",
     "canvg": "^4.0.3",
+    "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "html2pdf": "^0.0.11",
     "html2pdf.js": "^0.10.3",

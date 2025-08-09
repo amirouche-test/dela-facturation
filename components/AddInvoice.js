@@ -11,7 +11,7 @@ import {
   HiCube,
   HiXCircle,
 } from 'react-icons/hi';
-import FactureModal from "./FactureModal";
+import FacturePreviewWithImage from "./FacturePreviewWithImage";
 import { toast } from 'react-hot-toast';
 
 function Spinner() {
@@ -54,7 +54,7 @@ export default function AddInvoice() {
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
-  const [openModal, setOpenModal] = useState(false);
+  const [submit, setSubmit] = useState(false);
   const [factureData, setFactureData] = useState(null);
 
   useEffect(() => {
@@ -138,9 +138,8 @@ export default function AddInvoice() {
         total,
       };
 
-      // Ouvrir le modal avec les données
       setFactureData(facture);
-      setOpenModal(true);
+      setSubmit(true);
 
     } catch (error) {
       toast.error(error.message || "Erreur lors de l'enregistrement");
@@ -403,11 +402,7 @@ export default function AddInvoice() {
         {saving && <Spinner />}
         {!saving ? 'Enregistrer la facture' : 'Enregistrement...'}
       </button>
-      <FactureModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        facture={factureData}
-      />
+      {submit && <FacturePreviewWithImage facture={factureData}/> }
     </form>
   );
 }

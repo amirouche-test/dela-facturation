@@ -22,7 +22,7 @@ export default function HomePage() {
       case 'addInvoice':
         return <AddInvoice />;
       default:
-        return <div>Bienvenue sur DélaFacturation</div>;
+        return <AddInvoice />;
     }
   }
 
