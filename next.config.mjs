@@ -3,15 +3,16 @@
 
 // export default nextConfig;
 
-const withPWA = require('next-pwa')({
-    dest: 'public',
-    disable: process.env.NODE_ENV === 'development',
-  });
-  
-  module.exports = withPWA({
-    experimental: {
-      appDir: true, // actif pour Next.js 13+ avec app/
-    },
-    reactStrictMode: true,
-  });
-  
+import withPWA from 'next-pwa';
+
+const nextConfig = withPWA({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  experimental: {
+    appDir: true,
+  },
+  reactStrictMode: true,
+});
+
+export default nextConfig;
+
