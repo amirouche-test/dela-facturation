@@ -1,27 +1,17 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { toPng } from 'html-to-image';
 import { Phone, Mail, MapPin } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
-export default function FacturePreviewWithImage({ facture }) {
+export default function FactureGenerate({ facture }) {
   const factureRef = useRef(null);
-  const [imgData, setImgData] = useState(null);
-  const [error, setError] = useState('');
 
   if (!facture) return null;
 
-  const downloadImage = () => {
-    if (!imgData) return;
-    const link = document.createElement('a');
-    link.download = `facture-${facture.numeroFacture}.png`;
-    link.href = imgData;
-    link.click();
-  };
-
-  const generateImage = () => {
+  const generateAndDownloadImage = () => {
     if (!factureRef.current) return;
-    setError('');
     toPng(factureRef.current, {
       cacheBust: true,
       skipFonts: true,
@@ -29,11 +19,14 @@ export default function FacturePreviewWithImage({ facture }) {
       height: 842,
     })
       .then((dataUrl) => {
-        setImgData(dataUrl)
-        downloadImage()
+        const link = document.createElement('a');
+        link.download = `facture-${facture.numeroFacture}.png`;
+        link.href = dataUrl;
+        link.click();
       })
-      .catch(() => setError("Erreur lors de la génération de l'image."));
+      .catch(() => toast.error("Erreur lors de la génération de l'image."));
   };
+  
 
   return (
     <div className="w-[595px] mx-auto font-sans select-none">
@@ -152,7 +145,7 @@ export default function FacturePreviewWithImage({ facture }) {
   {/* Boutons */}
   <div className="mt-10 flex flex-col items-center space-y-5">
     <button
-      onClick={generateImage}
+      onClick={generateAndDownloadImage}
       className="bg-gray-900 cursor-pointer hover:bg-gray-800 transition duration-300 ease-in-out text-white font-semibold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5"
       aria-label="Générer l'image PNG de la facture au format A4"
     >

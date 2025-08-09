@@ -7,6 +7,7 @@ export async function GET() {
 
   try {
     const clients = await Client.find();
+    clients.reverse();
     return NextResponse.json(clients);
   } catch (error) {
     return NextResponse.json(

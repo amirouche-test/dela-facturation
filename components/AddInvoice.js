@@ -11,7 +11,7 @@ import {
   HiCube,
   HiXCircle,
 } from 'react-icons/hi';
-import FacturePreviewWithImage from "./FacturePreviewWithImage";
+import FactureGenerate from "./FactureGenerate";
 import { toast } from 'react-hot-toast';
 
 function Spinner() {
@@ -402,7 +402,7 @@ export default function AddInvoice() {
         {saving && <Spinner />}
         {!saving ? 'Générer la facture' : 'Génération ...'}
       </button>
-      {submit && <FacturePreviewWithImage facture={factureData}/> }
+      {submit && <FactureGenerate facture={factureData}/> }
     </form>
   );
 }
