@@ -400,7 +400,7 @@ export default function AddInvoice() {
         }`}
       >
         {saving && <Spinner />}
-        {!saving ? 'Enregistrer la facture' : 'Enregistrement...'}
+        {!saving ? 'Générer la facture' : 'Génération ...'}
       </button>
       {submit && <FacturePreviewWithImage facture={factureData}/> }
     </form>

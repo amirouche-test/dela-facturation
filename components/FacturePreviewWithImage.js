@@ -28,15 +28,19 @@ export default function FacturePreviewWithImage({ facture }) {
       width: 595,
       height: 842,
     })
-      .then((dataUrl) => setImgData(dataUrl))
+      .then((dataUrl) => {
+        setImgData(dataUrl)
+        downloadImage()
+      })
+
       .catch(() => setError("Erreur lors de la génération de l'image."));
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-gray-50 rounded-xl shadow-md font-sans select-none">
+    <div className="mx-auto p-8 bg-gray-50 rounded-xl shadow-md font-sans select-none">
   <div
     ref={factureRef}
-    className="bg-white p-10 w-[595px] h-[842px] flex flex-col justify-between border border-gray-200 rounded-lg shadow-sm"
+    className="displa bg-white p-10 w-[595px] h-[842px] flex flex-col justify-between border border-gray-200 rounded-lg shadow-sm"
     style={{ fontFamily: 'Arial, sans-serif', fontSize: 13, color: '#111827' }}
     aria-label={`Facture numéro ${facture.numeroFacture}`}
   >
@@ -153,27 +157,8 @@ export default function FacturePreviewWithImage({ facture }) {
       className="bg-gray-900 hover:bg-gray-800 transition duration-300 ease-in-out text-white font-semibold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5"
       aria-label="Générer l'image PNG de la facture au format A4"
     >
-      Générer image PNG (A4)
+      Télécharger
     </button>
-
-    {error && <p className="text-red-600 font-semibold" role="alert">{error}</p>}
-
-    {imgData && (
-      <>
-        <img
-          src={imgData}
-          alt={`Image PNG de la facture numéro ${facture.numeroFacture}`}
-          className="border border-gray-400 rounded-lg w-[595px] h-[842px] object-contain shadow-md"
-        />
-        <button
-          onClick={downloadImage}
-          className="mt-6 bg-gray-900 hover:bg-gray-800 transition duration-300 ease-in-out text-white font-semibold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5"
-          aria-label="Télécharger l'image PNG de la facture"
-        >
-          Télécharger l'image
-        </button>
-      </>
-    )}
   </div>
 </div>
 
