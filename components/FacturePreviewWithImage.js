@@ -107,7 +107,7 @@ export default function FacturePreviewWithImage({ facture }) {
 
     {/* Totaux */}
     <div className="text-sm flex justify-end mb-8" aria-label="Totaux">
-      <table className="text-right font-semibold">
+      <table className="text-right">
         <tbody>
           <tr>
             <td className="pr-6 text-gray-700">TOTAL HT :</td>
