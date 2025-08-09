@@ -32,15 +32,14 @@ export default function FacturePreviewWithImage({ facture }) {
         setImgData(dataUrl)
         downloadImage()
       })
-
       .catch(() => setError("Erreur lors de la génération de l'image."));
   };
 
   return (
-    <div className="mx-auto p-8 bg-gray-50 rounded-xl shadow-md font-sans select-none">
+    <div className="w-[595px] mx-auto font-sans select-none">
   <div
     ref={factureRef}
-    className="displa bg-white p-10 w-[595px] h-[842px] flex flex-col justify-between border border-gray-200 rounded-lg shadow-sm"
+    className="displa bg-white p-10 w-[595px] h-[842px] flex flex-col justify-between border border-gray-200 shadow-sm"
     style={{ fontFamily: 'Arial, sans-serif', fontSize: 13, color: '#111827' }}
     aria-label={`Facture numéro ${facture.numeroFacture}`}
   >
@@ -100,10 +99,10 @@ export default function FacturePreviewWithImage({ facture }) {
       <tbody>
         {facture.produits.map((prod, i) => (
           <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-            <td className="border border-gray-300 p-3">{prod.nom}</td>
-            <td className="border border-gray-300 p-3 text-right">{prod.prixUnitaire}</td>
-            <td className="border border-gray-300 p-3 text-right">{prod.quantite}</td>
-            <td className="border border-gray-300 p-3 text-right">{prod.montant}</td>
+            <td className="border border-gray-300 px-3 py-1">{prod.nom}</td>
+            <td className="border border-gray-300 px-3 py-1 text-right">{prod.prixUnitaire}</td>
+            <td className="border border-gray-300 px-3 py-1 text-right">{prod.quantite}</td>
+            <td className="border border-gray-300 px-3 py-1 text-right">{prod.montant}</td>
           </tr>
         ))}
       </tbody>
@@ -154,10 +153,10 @@ export default function FacturePreviewWithImage({ facture }) {
   <div className="mt-10 flex flex-col items-center space-y-5">
     <button
       onClick={generateImage}
-      className="bg-gray-900 hover:bg-gray-800 transition duration-300 ease-in-out text-white font-semibold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5"
+      className="bg-gray-900 cursor-pointer hover:bg-gray-800 transition duration-300 ease-in-out text-white font-semibold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5"
       aria-label="Générer l'image PNG de la facture au format A4"
     >
-      Télécharger
+      Télécharger La Facture
     </button>
   </div>
 </div>

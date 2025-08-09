@@ -278,7 +278,7 @@ export default function AddInvoice() {
           </p>
         )}
 
-        <div className="overflow-x-auto border border-gray-300 rounded-md max-h-[280px] sm:max-h-[320px] overflow-y-auto">
+        <div className="overflow-x-auto border border-gray-300 rounded-md ">
           <table className="w-full min-w-[650px] table-auto border-collapse">
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
