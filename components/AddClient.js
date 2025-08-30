@@ -5,14 +5,15 @@ import toast from 'react-hot-toast';
 import {
   HiUser,
   HiIdentification,
-  HiDocumentText,
 } from 'react-icons/hi';
 
 export default function AddClient() {
   const [client, setClient] = useState({
     nom: '',
     prenom: '',
-    numeroRegistreCommerce: '',
+    numeroRC: '',
+    numeroNIF: '',
+    numeroART: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -24,7 +25,7 @@ export default function AddClient() {
     e.preventDefault();
     setSaving(true);
 
-    if (!client.nom || !client.prenom || !client.numeroRegistreCommerce) {
+    if (!client.nom || !client.prenom || !client.numeroRC || !client.numeroNIF || !client.numeroART) {
       toast.error('Veuillez remplir tous les champs');
       setSaving(false);
       return;
@@ -40,7 +41,7 @@ export default function AddClient() {
       if (!res.ok) throw new Error('Erreur lors de la création');
 
       toast.success('Client ajouté avec succès');
-      setClient({ nom: '', prenom: '', numeroRegistreCommerce: '' });
+      setClient({ nom: '', prenom: '', numeroRC: '', numeroNIF: '', numeroART: '' });
     } catch {
       toast.error('Erreur lors de l\'ajout du client');
     } finally {
@@ -61,7 +62,9 @@ export default function AddClient() {
       {[
         { label: 'Nom', name: 'nom', type: 'text', icon: <HiUser className="inline mr-1 text-[#27ae60]" size={18} /> },
         { label: 'Prénom', name: 'prenom', type: 'text', icon: <HiUser className="inline mr-1 text-[#27ae60]" size={18} /> },
-        { label: 'Numéro registre de commerce', name: 'numeroRegistreCommerce', type: 'text', icon: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} /> },
+        { label: 'Numéro registre de commerce', name: 'numeroRC', type: 'text', icon: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} /> },
+        { label: 'Numéro NIF', name: 'numeroNIF', type: 'text', icon: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} /> },
+        { label: 'Numéro ART', name: 'numeroART', type: 'text', icon: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} /> },
       ].map(({ label, name, type, icon }) => (
         <label key={name} className="block mb-5">
           <span className="block mb-1 text-xs font-medium text-gray-800 select-none">

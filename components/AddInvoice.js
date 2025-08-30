@@ -46,10 +46,13 @@ export default function AddInvoice() {
   const [manualClient, setManualClient] = useState({
     nom: '',
     prenom: '',
-    numeroRegistreCommerce: '',
+    numeroRC: '',
+    numeroNIF: '',
+    numeroART: '',
   });
   const [numeroFacture, setNumeroFacture] = useState('');
   const [dateFacture, setDateFacture] = useState(new Date().toISOString().slice(0, 10));
+  const [typePaiement, setTypePaiement] = useState('');
   const [produits, setProduits] = useState([{ id: 1, nom: '', prixUnitaire: '', quantite: '', montant: 0 }]);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -76,9 +79,12 @@ export default function AddInvoice() {
     if (!selectedClientId) {
       if (!manualClient.nom.trim()) newErrors.nom = 'Nom requis';
       if (!manualClient.prenom.trim()) newErrors.prenom = 'Prénom requis';
-      if (!manualClient.numeroRegistreCommerce.trim()) newErrors.numeroRegistreCommerce = 'Numéro requis';
+      if (!manualClient.numeroRC.trim()) newErrors.numeroRC = 'Numéro RC requis';
+      if (!manualClient.numeroNIF.trim()) newErrors.numeroNIF = 'Numéro NIF requis';
+      if (!manualClient.numeroART.trim()) newErrors.numeroART = 'Numéro ART requis';
     }
     if (!numeroFacture.trim()) newErrors.numeroFacture = 'Numéro facture requis';
+    if (!typePaiement) newErrors.typePaiement = 'Type de paiement requis';
     if (produits.length === 0) newErrors.produits = 'Ajouter au moins un produit';
     produits.forEach((p, i) => {
       if (!p.nom.trim()) newErrors[`prod_nom_${i}`] = 'Nom produit requis';
@@ -106,14 +112,14 @@ export default function AddInvoice() {
   }
 
   function addProduit() {
-    setProduits((prev) => [...prev, { id: Date.now(), nom: '', prixUnitaire: '', quantite: '', montant: 0 }]);
+    setProduits((prev) => [...prev, { id: prev.length + 1, nom: '', prixUnitaire: '', quantite: '', montant: 0 }]);
   }
 
   function removeProduit(index) {
     setProduits((prev) => prev.filter((_, i) => i !== index));
   }
 
-  const total = produits.reduce((acc, p) => acc + p.montant, 0);
+  const totalHT = produits.reduce((acc, p) => acc + p.montant, 0);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -134,8 +140,9 @@ export default function AddInvoice() {
           : manualClient,
         numeroFacture,
         dateFacture,
-        produits: produits.map(({ id, ...rest }) => rest),
-        total,
+        typePaiement,
+        produits,
+        totalHT,
       };
 
       setFactureData(facture);
@@ -154,8 +161,6 @@ export default function AddInvoice() {
       className="mx-auto p-6 bg-white rounded-lg shadow-md space-y-8 text-xs sm:text-base"
       noValidate
     >
-      {/* ... Le reste du JSX reste inchangé ... */}
-
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Ajouter une facture
       </h2>
@@ -172,13 +177,15 @@ export default function AddInvoice() {
             setSelectedClientId(e.target.value);
             if (e.target.value) {
               const c = clients.find((c) => c._id === e.target.value);
-              if (c) setManualClient({ nom: c.nom, prenom: c.prenom, numeroRegistreCommerce: c.numeroRegistreCommerce });
-            } else setManualClient({ nom: '', prenom: '', numeroRegistreCommerce: '' });
+              if (c) setManualClient({ nom: c.nom, prenom: c.prenom, numeroRC: c.numeroRC, numeroNIF: c.numeroNIF, numeroART: c.numeroART  });
+            } else setManualClient({ nom: '', prenom: '', numeroRC: '' , numeroNIF: '' , numeroART: '' });
             setErrors((prev) => {
               const newErrors = { ...prev };
               delete newErrors.nom;
               delete newErrors.prenom;
-              delete newErrors.numeroRegistreCommerce;
+              delete newErrors.numeroRC;
+              delete newErrors.numeroNIF;
+              delete newErrors.numeroART;
               return newErrors;
             });
           }}
@@ -187,7 +194,7 @@ export default function AddInvoice() {
           <option value="">-- Aucun --</option>
           {clients.map((c) => (
             <option key={c._id} value={c._id}>
-              {c.nom} {c.prenom} — {c.numeroRegistreCommerce}
+              {c.nom} {c.prenom} — {c.numeroRC}
             </option>
           ))}
         </select>
@@ -195,18 +202,18 @@ export default function AddInvoice() {
 
       {/* Manual Client */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {['nom', 'prenom', 'numeroRegistreCommerce'].map((field) => (
+        {['nom', 'prenom', 'numeroRC', 'numeroNIF', 'numeroART'].map((field) => (
           <div key={field}>
             <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
               {field === 'nom' || field === 'prenom' ? <HiUser className={`text-[#27ae60] w-5 h-5${field==='prenom'?' rotate-180':''}`} /> : <HiIdentification className="text-[#27ae60] w-5 h-5" />}
-              {field === 'nom' ? 'Nom' : field === 'prenom' ? 'Prénom' : 'N° Registre Commerce'}
+              {field === 'nom' ? 'Nom' : field === 'prenom' ? 'Prénom' : field === 'numeroRC' ? 'N° Registre Commerce' : field === 'numeroNIF' ? 'N° NIF' : 'N° ART'}
             </label>
             <input
               type="text"
               value={manualClient[field]}
               onChange={(e) => setManualClient((prev) => ({ ...prev, [field]: e.target.value }))}
               disabled={selectedClientId !== ''}
-              placeholder={field === 'numeroRegistreCommerce' ? 'N° Registre' : field === 'prenom' ? 'Prénom' : 'Nom'}
+              placeholder={field === 'nom' ? 'Nom' : field === 'prenom' ? 'Prénom' : field === 'numeroRC' ? 'N° Registre Commerce' : field === 'numeroNIF' ? 'N° NIF' : 'N° ART'}
               className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition disabled:bg-gray-100 ${
                 errors[field] ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -223,8 +230,8 @@ export default function AddInvoice() {
         ))}
       </div>
 
-      {/* Numéro et Date */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* Numéro, Date et Type de paiement */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
           <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
             <HiHashtag className="text-[#27ae60] w-5 h-5" />
@@ -239,16 +246,15 @@ export default function AddInvoice() {
             className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition ${
               errors.numeroFacture ? 'border-red-500' : 'border-gray-300'
             }`}
-            aria-invalid={!!errors.numeroFacture}
-            aria-describedby="error-numeroFacture"
           />
           {errors.numeroFacture && (
-            <p className="text-red-600 text-sm mt-1 flex items-center gap-1" id="error-numeroFacture">
+            <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
               <HiXCircle className="w-4 h-4" />
               {errors.numeroFacture}
             </p>
           )}
         </div>
+
         <div>
           <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
             <HiCalendar className="text-[#27ae60] w-5 h-5" />
@@ -261,6 +267,30 @@ export default function AddInvoice() {
             required
             className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition border-gray-300"
           />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-1 text-gray-700 font-medium mb-1">
+            Type de paiement
+          </label>
+          <select
+            value={typePaiement}
+            onChange={(e) => setTypePaiement(e.target.value)}
+            required
+            className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#27ae60] transition ${
+              errors.typePaiement ? 'border-red-500' : 'border-gray-300'
+            }`}
+          >
+            <option value="Paiement par chèque">Paiement par chèque</option>
+            <option value="Paiement par espèce">Paiement par espèce</option>
+            <option value="Paiement à terme">Paiement à terme</option>
+          </select>
+          {errors.typePaiement && (
+            <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+              <HiXCircle className="w-4 h-4" />
+              {errors.typePaiement}
+            </p>
+          )}
         </div>
       </div>
 
@@ -282,7 +312,7 @@ export default function AddInvoice() {
           <table className="w-full min-w-[650px] table-auto border-collapse">
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
-                <th className="border border-gray-300 px-4 py-2 text-left">Produit</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Désignation</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Prix unitaire (DA)</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Quantité</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Montant (DA)</th>
@@ -377,11 +407,39 @@ export default function AddInvoice() {
             </tbody>
           </table>
         </div>
+        
+        <div className='mt-2 flex justify-end ' >
+          <div>
+            <div className="bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800 ">
+              Total HT :
+            </div>
+            <div className=" bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800 ">
+              TVA 19% :
+            </div>
+            <div className=" bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800 ">
+              Remise :
+            </div>
+            <div className=" bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800 ">
+              TOTAL TTC :
+            </div>
+          </div>
 
-        <div className="mt-2 flex justify-end items-center bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800 ">
-          Total : {total.toFixed(2)} DA
+          <div className='text-center'>
+            <div className="bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800">
+              {totalHT.toFixed(2)} DA
+            </div>
+            <div className="bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800">
+              0.00 DA
+            </div>
+            <div className="bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800">
+              0.00 DA
+            </div>
+            <div className="bg-gray-50 border border-gray-300 rounded-md px-4 py-2 font-semibold text-green-800">
+              {totalHT.toFixed(2)} DA
+            </div>
+          </div>
         </div>
-
+        
         <button
           type="button"
           onClick={addProduit}

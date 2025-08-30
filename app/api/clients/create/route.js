@@ -8,14 +8,6 @@ export async function POST(req) {
   try {
     const data = await req.json();
 
-    // Vérifie les champs obligatoires
-    if (!data.nom || !data.prenom || !data.numeroRegistreCommerce) {
-      return NextResponse.json(
-        { error: 'Nom, prénom et numéro RC sont obligatoires.' },
-        { status: 400 }
-      );
-    }
-
     const client = new Client(data);
     await client.save();
 

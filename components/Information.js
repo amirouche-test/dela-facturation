@@ -18,9 +18,12 @@ const iconsMap = {
   marque: <HiTag className="inline mr-1 text-[#27ae60]" size={18} />,
   nomFabricant: <HiUser className="inline mr-1 text-[#27ae60]" size={18} />,
   prenomFabricant: <HiUser className="inline mr-1 text-[#27ae60]" size={18} />,
-  numeroRegistreCommerce: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} />,
+  numeroRC: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} />,
+  numeroART: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} />,
+  numeroNIF: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} />,
+  numeroNIS: <HiIdentification className="inline mr-1 text-[#27ae60]" size={18} />,
   telephone: <HiPhone className="inline mr-1 text-[#27ae60]" size={18} />,
-  email: <HiMail className="inline mr-1 text-[#27ae60]" size={18} />,
+  // email: <HiMail className="inline mr-1 text-[#27ae60]" size={18} />,
   adressePhysique: <HiLocationMarker className="inline mr-1 text-[#27ae60]" size={18} />,
 };
 
@@ -95,9 +98,12 @@ export default function Information() {
         { label: 'Marque', name: 'marque', type: 'text' },
         { label: 'Nom fabricant', name: 'nomFabricant', type: 'text' },
         { label: 'Prénom fabricant', name: 'prenomFabricant', type: 'text' },
-        { label: 'Numéro registre de commerce', name: 'numeroRegistreCommerce', type: 'text' },
+        { label: 'Numéro registre de commerce', name: 'numeroRC', type: 'text' },
+        { label: 'Numéro ART', name: 'numeroART', type: 'text' },
+        { label: 'Numéro N.I.F', name: 'numeroNIF', type: 'text' },
+        { label: 'Numéro N.I.S', name: 'numeroNIS', type: 'text' },
         { label: 'Téléphone', name: 'telephone', type: 'text' },
-        { label: 'Adresse email', name: 'email', type: 'email' },
+        // { label: 'Adresse email', name: 'email', type: 'email' },
       ].map(({ label, name, type }) => (
         <label key={name} className="block mb-4 text-sm text-gray-700 select-none">
           <span className="flex items-center mb-1 text-[#27ae60] font-semibold">
