@@ -149,11 +149,11 @@ export default function FactureGenerate({ facture }) {
         {/* Footer */}
         <footer className="flex justify-between text-[11px] text-gray-700 mt-3 pt-1 border-t border-gray-200">
           <div className="flex items-center space-x-1">
-            <Phone className="w-3 h-3 text-gray-400" />
+            <Phone className="w-3 h-3 text-gray-600" />
             <span>{facture.fabricant.telephone}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <MapPin className="w-3 h-3 text-gray-400" />
+            <MapPin className="w-3 h-3 text-gray-600" />
             <span>{facture.fabricant.adressePhysique}</span>
           </div>
         </footer>

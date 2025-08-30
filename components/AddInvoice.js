@@ -52,7 +52,7 @@ export default function AddInvoice() {
   });
   const [numeroFacture, setNumeroFacture] = useState('');
   const [dateFacture, setDateFacture] = useState(new Date().toISOString().slice(0, 10));
-  const [typePaiement, setTypePaiement] = useState('');
+  const [typePaiement, setTypePaiement] = useState('Paiement par chèque');
   const [produits, setProduits] = useState([{ id: 1, nom: '', prixUnitaire: '', quantite: '', montant: 0 }]);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
